@@ -20,13 +20,13 @@ export function countNames(text: string, titles: string[], firstNames: string[],
 
   // Use a native for loop so that we can modify the index directly inside the loop, enabling us to skip over entries when necessary
   for (let i = 0; i < allWordsInText.length; i++) {
-    // TODO refactor logic
     const currentWord = allWordsInText[i];
     // If a title is found, look for corresponding first/last names
     if (titlesMap[currentWord]) {
       const nameParts: string[] = [currentWord];
       let matchNotFound = false;
       let currentIndex = i;
+      // Loop over the next words in the array until you find one that isn't a name, then break the loop.
       while (!matchNotFound) {
         currentIndex++;
         const nextWord = allWordsInText[currentIndex];
@@ -48,8 +48,10 @@ export function countNames(text: string, titles: string[], firstNames: string[],
         } else {
           foundNames.set(fullName, new MatchingName(fullName));
         }
+        // We increment the `i` index to avoid double counting words we've already processed
         i += nameParts.length - 1;
       }
+      // If no title, see if there are first name(s) followed by a last name
     } else if (firstNamesMap[currentWord]) {
       const nameParts: string[] = [currentWord];
       let matchNotFound = false;
@@ -80,12 +82,15 @@ export function countNames(text: string, titles: string[], firstNames: string[],
     }
   }
 
-  return Array.from(foundNames.values()).sort((a, b) => {
-    return b.timesFound - a.timesFound;
-  }).map(foundName => {
-    return {
-      name: foundName.toString(),
-      timesFound: foundName.timesFound
-    };
-  });
+  return Array.from(foundNames.values())
+    // Sort by times found descending before returning the results
+    .sort((a, b) => {
+      return b.timesFound - a.timesFound;
+    })
+    .map(foundName => {
+      return {
+        name: foundName.toString(),
+        timesFound: foundName.timesFound
+      };
+    });
 }

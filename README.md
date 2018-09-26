@@ -22,3 +22,7 @@ countNames(text: string, titles: string[], firstNames: string[], lastNames: stri
 ```typescript
 countNames('My name is Mr. Daniel Young and I like to code', ['Mr', 'Mrs'], ['Daniel', 'Danielle'], ['Young', 'Old']) // returns [{ name 'Mr Daniel Young', timesFound: 1}]
 ```
+
+## Limitations
+
+Does not support double-barreled last names.
