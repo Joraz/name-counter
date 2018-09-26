@@ -1,14 +1,26 @@
 {
   "name": "name-counter",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "1.0.1",
+  "engines": {
+    "node": ">=8.12.0"
+  },
+  "main": "dist/index.js",
   "license": "MIT",
+  "author": {
+    "name": "Dan Young"
+  },
   "scripts": {
     "start": "yarn run build && yarn run serve",
     "build": "./node_modules/.bin/tsc",
-    "serve": "node dist/index.js"
+    "serve": "node dist/index.js",
+    "test": "yarn jest"
   },
   "devDependencies": {
+    "@types/jest": "^23.3.2",
+    "@types/node": "10.11.0",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.1",
+    "tslint": "^5.11.0",
     "typescript": "3.0.3"
   }
 }
