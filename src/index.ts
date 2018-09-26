@@ -1,1 +1,91 @@
-console.log('hello world');
+import { MatchingName, MatchingNameMap } from './matching-name';
+import { toMap } from './utils';
+
+export function countNames(text: string, titles: string[], firstNames: string[], lastNames: string[]): Array<{ name: string, timesFound: number }> {
+  const allWordsInText = text
+    // remove special characters
+    .replace(/[.,\/#!$%\^&\*;:{}=\-_`'"~()]+/g, '')
+    // trim extra whitespace
+    .replace(/\s{2,}/g, ' ')
+    // split into separate words
+    .split(/[\s\r\n]/)
+    // remove empty string entries
+    .filter(Boolean);
+
+  const foundNames: MatchingNameMap = new Map();
+  // We convert the arrays into maps to make it easier & quicker to access values
+  const titlesMap = toMap(titles);
+  const firstNamesMap = toMap(firstNames);
+  const lastNamesMap = toMap(lastNames);
+
+  // Use a native for loop so that we can modify the index directly inside the loop, enabling us to skip over entries when necessary
+  for (let i = 0; i < allWordsInText.length; i++) {
+    // TODO refactor logic
+    const currentWord = allWordsInText[i];
+    // If a title is found, look for corresponding first/last names
+    if (titlesMap[currentWord]) {
+      const nameParts: string[] = [currentWord];
+      let matchNotFound = false;
+      let currentIndex = i;
+      while (!matchNotFound) {
+        currentIndex++;
+        const nextWord = allWordsInText[currentIndex];
+        if (firstNamesMap[nextWord]) {
+          nameParts.push(nextWord);
+        } else {
+          matchNotFound = true;
+        }
+      }
+
+      if (lastNamesMap[allWordsInText[currentIndex]]) {
+        nameParts.push(allWordsInText[currentIndex]);
+      }
+
+      if (nameParts.length >= 2) {
+        const fullName = nameParts.join(' ');
+        if (foundNames.has(fullName)) {
+          foundNames.get(fullName).increment();
+        } else {
+          foundNames.set(fullName, new MatchingName(fullName));
+        }
+        i += nameParts.length - 1;
+      }
+    } else if (firstNamesMap[currentWord]) {
+      const nameParts: string[] = [currentWord];
+      let matchNotFound = false;
+      let currentIndex = i;
+      while (!matchNotFound) {
+        currentIndex++;
+        const nextWord = allWordsInText[currentIndex];
+        if (firstNamesMap[nextWord]) {
+          nameParts.push(nextWord);
+        } else {
+          matchNotFound = true;
+        }
+      }
+
+      if (lastNamesMap[allWordsInText[currentIndex]]) {
+        nameParts.push(allWordsInText[currentIndex]);
+      }
+
+      if (nameParts.length >= 1) {
+        const fullName = nameParts.join(' ');
+        if (foundNames.has(fullName)) {
+          foundNames.get(fullName).increment();
+        } else {
+          foundNames.set(fullName, new MatchingName(fullName));
+        }
+        i += nameParts.length - 1;
+      }
+    }
+  }
+
+  return Array.from(foundNames.values()).sort((a, b) => {
+    return b.timesFound - a.timesFound;
+  }).map(foundName => {
+    return {
+      name: foundName.toString(),
+      timesFound: foundName.timesFound
+    };
+  });
+}
