@@ -79,6 +79,14 @@ export function countNames(text: string, titles: string[], firstNames: string[],
         }
         i += nameParts.length - 1;
       }
+      // This will handle a surname being used on it's own, e.g. Fagin
+    } else if (lastNamesMap[currentWord]) {
+      if (foundNames.has(currentWord)) {
+        foundNames.get(currentWord).increment();
+      } else {
+        foundNames.set(currentWord, new MatchingName(currentWord));
+      }
+      // No need to increment i in this path, as we're only using the current name
     }
   }
 
